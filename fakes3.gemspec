@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.add_development_dependency "rake"
   s.add_development_dependency "aws-sdk", "~> 2"
   s.add_development_dependency "aws-sdk-v1"
+  s.add_development_dependency "xml-simple"
   s.add_development_dependency "test-unit"
   s.add_development_dependency "mocha"
   #s.add_development_dependency "ruby-debug"

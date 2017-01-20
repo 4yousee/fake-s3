@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    fakes3 (0.2.5)
+    fakes3 (1.0.0)
       builder
       thor
 
@@ -71,6 +71,7 @@ DEPENDENCIES
   rest-client
   right_aws
   test-unit
+  xml-simple
 
 BUNDLED WITH
-   1.10.2
+   1.13.7

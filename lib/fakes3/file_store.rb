@@ -5,6 +5,7 @@ require 'fakes3/bucket'
 require 'fakes3/rate_limitable_file'
 require 'digest/md5'
 require 'yaml'
+require 'find'
 
 module FakeS3
   class FileStore
@@ -21,11 +22,38 @@ module FakeS3
       @buckets = []
       @bucket_hash = {}
       Dir[File.join(root,"*")].each do |bucket|
+
+        objects = get_bucket_objects(bucket)
+
         bucket_name = File.basename(bucket)
-        bucket_obj = Bucket.new(bucket_name,Time.now,[])
+        bucket_obj = Bucket.new(bucket_name,Time.now,objects)
         @buckets << bucket_obj
         @bucket_hash[bucket_name] = bucket_obj
       end
+    end
+
+    def get_bucket_objects(bucket_path)
+      results = []
+      regex = Regexp.new(File.join(bucket_path, "(.+)/#{FAKE_S3_METADATA_DIR}/metadata"))
+
+      Find.find(bucket_path) do |path|
+        if match_path = regex.match(path)
+          file_data = YAML.load_file(match_path[0])
+          object_name = match_path[1]
+
+          obj = S3Object.new
+          obj.name = object_name
+          obj.md5 = file_data[:md5]
+          obj.content_type = file_data[:content_type]
+          obj.content_encoding = file_data[:content_encoding]
+          obj.size = file_data[:size]
+          obj.modified_date = file_data[:modified_date]
+
+          results << obj
+        end
+      end
+
+      results
     end
 
     # Pass a rate limit in bytes per second

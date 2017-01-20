@@ -10,6 +10,7 @@ require 'fakes3/bucket_query'
 require 'fakes3/unsupported_operation'
 require 'fakes3/errors'
 require 'ipaddr'
+require 'xmlsimple'
 
 module FakeS3
   class Request
@@ -167,6 +168,7 @@ module FakeS3
           response.body = real_obj.io
         end
       end
+
     end
 
     def do_PUT(request, response)
@@ -265,6 +267,17 @@ module FakeS3
         )
 
         response.body = XmlAdapter.complete_multipart_result real_obj
+      elsif query.has_key?('delete')
+        data = XmlSimple.xml_in(request.body)
+        data['Object'].each do |object|
+          if object['Key'] and object['Key'][0]
+            bucket_obj = @store.get_bucket(s_req.bucket)
+            @store.delete_object(bucket_obj,object['Key'][0],s_req.webrick_request)            
+          end
+        end
+
+        response.status = 204
+        response.body = ""
       elsif request.content_type =~ /^multipart\/form-data; boundary=(.+)/
         key = request.query['key']
 
