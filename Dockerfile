@@ -1,6 +1,6 @@
-FROM alpine:3.4
+FROM ruby:2.4
 
-RUN apk add --no-cache --update ruby ruby-dev ruby-bundler python py-pip git build-base libxml2-dev libxslt-dev
+RUN apt-get update && apt-get install -y python python-dev build-essential python-pip git libxml2-dev libxslt-dev libgmp3-dev
 RUN pip install boto s3cmd
 
 COPY fakes3.gemspec Gemfile Gemfile.lock /app/
@@ -12,7 +12,7 @@ RUN bundle install
 
 COPY . /app/
 
-RUN mkdir -p /fakes3_root
+RUN mkdir -p /fakes3_storage
 ENTRYPOINT ["/app/bin/fakes3"]
-CMD ["-r",  "/fakes3_root", "-p",  "4569"]
+CMD ["-r",  "/fakes3_storage", "-p",  "4569"]
 EXPOSE 4569
