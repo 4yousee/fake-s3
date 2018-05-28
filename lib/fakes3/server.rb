@@ -478,6 +478,10 @@ module FakeS3
         s_req.is_path_style = false
       end
 
+      if ENV["FAKES3_DEFAULT_BUCKET"]
+        s_req.bucket = ENV["FAKES3_DEFAULT_BUCKET"]
+      end
+
       s_req.http_verb = webrick_req.request_method
 
       case webrick_req.request_method
